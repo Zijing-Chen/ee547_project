@@ -2,15 +2,35 @@
 
 Below are the list of files, folders and their usage:
 
-Mongo dabate
-Collection for username and password
+Mongo dabase scheme:
+Database structure:
+-Database name: books_project
+	-Collection name: user_data
+		_id: ID
+		username: String
+		password: String
+		read_booklist: [book_id]
+		unread_booklist: [book_id]
+		custom_covers: {book_id: Binarydata}
+		reading_goal: {genre: String
+					   length: Int}
+		booklist_genres: [String] //all genres from most to least
+		
 
-Collection of user data
-each document under userdata will be information for that user
+config/mongo
+Connection to mongoDB, alter this file based on your own local environment
 
-Meeting 1: Goals
-BACKEND
-Simple database, enable login of user to access their own homepage and reading list data collection
+main.js
+Main file for backend connections
 
-FRONTEND
-Log in page, start on homepage of user
+views/pages:
+- login.ejs: login page
+-
+
+public: add css files + more
+
+
+
+
+
+

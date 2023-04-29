@@ -1,0 +1,2 @@
+//alter this for your own settings
+{"host":"172.18.0.2","port":"27017","db":"books_project","opts":{"useUnifiedTopology":true}}
