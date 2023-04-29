@@ -44,17 +44,82 @@ class Database{
     }
 
     //Login
-    async validation(){
+    async userValidate(username, password){
         //takes inputs for username and password, validates from collection: user_data
         //throws error when invalid username/password
+        try{
+            let collection = this.db.collection('user_data');
+            let user = await collection.findOne({ username: username });
+            if(user.password==password){
+                //correct password to username
+                return user._id;
+            }
+            else{
+                return null;
+            }
+        }
+        catch(err){
+            console.log(err);
+            return null;
+        }
     }
-
-    async userCreate(){
+    async userCreate(username, password){
         //allows user to input username and password and create document
         //ensure new username
+        //does not allow spaces in username or password
+        try{
+            let collection = this.db.collection('user_data');
+            let user = await collection.findOne({ username: username });
+            if(user){
+                //user already exists
+                return 2;
+            }
+            else if(username.includes(' ')){
+                //invalid username
+                return 3;
+            }
+            else{
+                //check collection exists
+                const check =await this.db.listCollections({ name: 'user_data' }).toArray();
+                if (check.length<=0) {
+                    // Create the 'user_data' collection if it does not exist
+                    await this.db.createCollection('user_data');
+                }
+                let collection = this.db.collection('user_data');
+                const { insertedId: uid } = await collection.insertOne({_id: new ObjectId(), username: username, password:password});
+                if (!uid) {
+                    throw new Error(`Error inserting user -- data:${data}`);
+                }
+                return 1;
+            }
+        }
+        catch(err){
+            console.log(err)
+            return null;
+        }
     }
-
-
+    //get users
+    async getUsers(){
+        //get all users
+        try{
+            let collection = this.db.collection('user_data');
+            let users = await collection.find({}).toArray();
+            var new_users = [];
+            for(let i=0; i<users.length;i++){
+                let temp_user = users[i];
+                var reformed_user = {user_id:temp_user._id, 
+                                     username: temp_user.username,
+                                     password: temp_user.password};
+                new_users.push(reformed_user);
+            }
+            new_users.sort((a, b) => a.username.localeCompare(b.username));
+            return new_users;
+        }
+        catch(err){
+            console.error(err);
+            return [];
+        }
+    }
 
 }
 
@@ -84,13 +149,13 @@ const schema = buildSchema(`
 
 		popular_books : [Book]!
 
-
+        get_all_users: [User]!
     }
     type Mutation{
         user_create(
             username: String!
             password: String!
-        ): ID
+        ): Int
 
 		add_to_booklist(
 			book_id: ID! 
@@ -105,7 +170,7 @@ const schema = buildSchema(`
 		custom_cover(
 			book_id: ID!
 			user_id: ID!
-			file: Binarydata!
+			file: String!
 		): ID
     }
 
@@ -115,7 +180,7 @@ const schema = buildSchema(`
 		author: [String]!
 		genre: [String]!
 		is_read: Boolean!
-		cover: Binarydata!
+		cover: String!
 		description: String!
 		page_count: Int!
 	}
@@ -130,6 +195,36 @@ const schema = buildSchema(`
 
 
 const rootValue = {
+    user_validate: async ({username,password})=>{
+        try{
+            const uid = interact_db.userValidate(username,password);
+            return uid;
+        }
+        catch(err){
+            console.error(err);
+            throw new Error('Failed to validate user');
+        }
+    },
+    user_create: async({username,password})=>{
+        try{
+            const code = interact_db.userCreate(username,password);
+            return code;
+        }
+        catch{
+            console.error(err);
+            throw new Error('Failed to create user');
+        }
+    },
+    get_all_users: async()=>{
+        try{
+            const users = interact_db.getUsers();
+            return users;
+        }
+        catch(err){
+            console.error(err);
+            throw new Error('Failed to get users');
+        }   
+    },
 
 };
 
