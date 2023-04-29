@@ -21,7 +21,7 @@ config/mongo
 Connection to mongoDB, alter this file based on your own local environment
 
 main.js
-Main file for backend connections
+Main file for backend connections. Running on port 8000
 
 views/pages:
 - login.ejs: login page

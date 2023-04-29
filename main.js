@@ -5,7 +5,7 @@ const { MongoClient} = require('mongodb');
 const ObjectId = require('mongodb').ObjectId;
 const { graphqlHTTP } = require('express-graphql');
 const { buildSchema } = require('graphql');
-const { invalid } = require('moment');
+
 
 const MONGO_CONFIG_FILE = './config/mongo.json';
 
@@ -57,6 +57,10 @@ class Database{
 
 
 }
+
+const app = express();
+const interact_db = new Database();
+interact_db._connect(MONGO_CONFIG_FILE);
 
 const schema = buildSchema(`
     type Query{
@@ -123,3 +127,31 @@ const schema = buildSchema(`
 		
 	}
 `);
+
+
+const rootValue = {
+
+};
+
+app.use(express.static('public'))
+
+app.use('/graphql', graphqlHTTP({
+    schema: schema,
+    rootValue: rootValue,
+    graphiql: true
+}));
+
+const server = app.listen(8000);
+
+
+//only disconnect from mongodb after server shut down
+process.on('SIGINT', () => Shutdown(server, interact_db));
+process.on('SIGTERM', () => Shutdown(server, interact_db));
+
+function Shutdown(server, interact_db) {
+    server.close(() => {
+        console.log('Server closed');
+        interact_db._disconnect();
+        process.exit(0);
+    });
+}
