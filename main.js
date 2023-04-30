@@ -5,7 +5,8 @@ const { MongoClient} = require('mongodb');
 const ObjectId = require('mongodb').ObjectId;
 const { graphqlHTTP } = require('express-graphql');
 const { buildSchema } = require('graphql');
-GOOGLE_BOOK_API_KEY = "AIzaSyDzos4mIE59l9vvt3whhRBeNp4fncYDGtI";
+const axios = require('axios');
+const GOOGLE_BOOK_API_KEY = "AIzaSyDzos4mIE59l9vvt3whhRBeNp4fncYDGtI";
 
 
 const MONGO_CONFIG_FILE = './config/mongo.json';
@@ -271,9 +272,9 @@ const rootValue = {
         }   
     },
 
-    search_book_google_api: async (_, {keyword}, context) => {
+    search_book_google_api: async ({keyword}) => {
         try {
-            const books = getBooksFromGoogleBookApi(keyword);
+            const books = interact_db.getBooksFromGoogleBookApi(keyword);
             return books;
         }
         catch(err) {
