@@ -271,6 +271,17 @@ const rootValue = {
         }   
     },
 
+    search_book_google_api: async (_, {keyword}, context) => {
+        try {
+            const books = getBooksFromGoogleBookApi(keyword);
+            return books;
+        }
+        catch(err) {
+            console.error(err);
+            return new Error(`Google book api search with q=${keyword} failed.`);
+        }
+    },
+
 };
 
 app.use(express.static('public'))
