@@ -5,6 +5,7 @@ const { MongoClient} = require('mongodb');
 const ObjectId = require('mongodb').ObjectId;
 const { graphqlHTTP } = require('express-graphql');
 const { buildSchema } = require('graphql');
+GOOGLE_BOOK_API_KEY = "AIzaSyDzos4mIE59l9vvt3whhRBeNp4fncYDGtI";
 
 
 const MONGO_CONFIG_FILE = './config/mongo.json';
@@ -121,8 +122,52 @@ class Database{
         }
     }
 
-}
+    async getBooksFromGoogleBookApi(keyword) {
+        // Make google api get request.
+        // See https://developers.google.com/books/docs/v1/using#WorkingVolumes and https://cloud.google.com/docs/authentication/api-keys#using for implementationd details.
+        try {
+            const { body, _ } = await this.request("get", "https://www.googleapis.com/books/v1/volumes?q=" + keyword + "&key=" + GOOGLE_BOOK_API_KEY);
+            let result = await Promise.all(body.items.map(item => this.makeBookResponseFromGoogleBookApiResponse(item)));
+            return result;
+        }
+        catch (err) {
+            console.log(err);
+            return [];
+        }
+    }
 
+    async makeBookResponseFromGoogleBookApiResponse(item) {
+        // Parse google api get request response.
+        let book = {
+            book_id: item.id,
+            title: item.volumeInfo.subtitle ? item.volumeInfo.subtitle + item.volumeInfo.title : item.volumeInfo.title,
+            author: item.volumeInfo.authors,
+            genre: item.volumeInfo.categories, 
+            cover: item.volumeInfo.imageLinks.thumbnail,
+            description: item.volumeInfo.description,
+            page_count: item.volumeInfo.pageCount
+        }
+        return book;
+    }
+    async request(method, url, body = null, axiosOpts = {}) {
+        axiosOpts = {
+          ...this.defaultAxiosOpts,
+          ...axiosOpts,
+          headers: {},
+          method,
+          url
+        };
+    
+        if (body) {
+          axiosOpts.data = JSON.stringify(body);
+          axiosOpts.headers['Content-Type'] = 'application/json';
+        }
+    
+        const res = await axios(axiosOpts);
+    
+        return { body: res.data, headers: res.headers, status: res.status };
+      }
+}
 const app = express();
 const interact_db = new Database();
 interact_db._connect(MONGO_CONFIG_FILE);
@@ -175,7 +220,7 @@ const schema = buildSchema(`
     }
 
 	type Book{
-		book_id: ID!
+		book_id: String!
 		title: String!
 		author: [String]!
 		genre: [String]!
