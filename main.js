@@ -6,10 +6,14 @@ const ObjectId = require('mongodb').ObjectId;
 const { graphqlHTTP } = require('express-graphql');
 const { buildSchema } = require('graphql');
 const axios = require('axios');
+const jwt = require('jsonwebtoken');
+const DataLoader = require('dataloader');
+const { request } = require('http');
 const GOOGLE_BOOK_API_KEY = "AIzaSyDzos4mIE59l9vvt3whhRBeNp4fncYDGtI";
-
-
+const SECRET = "sdfglkjdnglewbgwpgkihipq2iu;liusher;";
+const TOKEN_EXPIRE_IN = "1d";
 const MONGO_CONFIG_FILE = './config/mongo.json';
+const bodyParser = require('body-parser');
 
 class Database{
     async _connect(configFile){
@@ -54,7 +58,7 @@ class Database{
             let user = await collection.findOne({ username: username });
             if(user.password==password){
                 //correct password to username
-                return user._id;
+                return user;
             }
             else{
                 return null;
@@ -69,16 +73,18 @@ class Database{
         //allows user to input username and password and create document
         //ensure new username
         //does not allow spaces in username or password
+        console.log(username);
         try{
+            
             let collection = this.db.collection('user_data');
             let user = await collection.findOne({ username: username });
             if(user){
                 //user already exists
-                return 2;
+                return [2, null];
             }
             else if(username.includes(' ')){
                 //invalid username
-                return 3;
+                return [3, null];
             }
             else{
                 //check collection exists
@@ -92,7 +98,7 @@ class Database{
                 if (!uid) {
                     throw new Error(`Error inserting user -- data:${data}`);
                 }
-                return 1;
+                return [1, uid.toString()];
             }
         }
         catch(err){
@@ -101,11 +107,11 @@ class Database{
         }
     }
     //get users
-    async getUsers(){
+    async getUsers(filter = {}){
         //get all users
         try{
             let collection = this.db.collection('user_data');
-            let users = await collection.find({}).toArray();
+            let users = await collection.find(filter).toArray();
             var new_users = [];
             for(let i=0; i<users.length;i++){
                 let temp_user = users[i];
@@ -169,16 +175,20 @@ class Database{
         return { body: res.data, headers: res.headers, status: res.status };
       }
 }
+
+async function getUsers(db, keys) {
+    keys = keys.map(key => new ObjectId(key));
+    let users = await db.getUsers({_id : {$in : keys}});
+    return keys.map(key => users.find(user => user.user_id == key.toString()) || new Error(`User ${key} doesn't exist`));
+}
+
 const app = express();
 const interact_db = new Database();
 interact_db._connect(MONGO_CONFIG_FILE);
 
 const schema = buildSchema(`
     type Query{
-        user_validate(
-            username: String!
-            password: String! 
-        ) : ID
+        user: User
 
         fetch_user_booklist(
 			user_id: ID!
@@ -201,7 +211,12 @@ const schema = buildSchema(`
         user_create(
             username: String!
             password: String!
-        ): Int
+        ): User!
+
+        login(
+            username: String!
+            password: String! 
+        ) : String!
 
 		add_to_booklist(
 			book_id: ID! 
@@ -241,20 +256,47 @@ const schema = buildSchema(`
 
 
 const rootValue = {
-    user_validate: async ({username,password})=>{
+    user(args, context) {
+        return context.user;
+    },
+
+    login: async ({username,password})=>{
+
         try{
-            const uid = interact_db.userValidate(username,password);
-            return uid;
+            const user = interact_db.userValidate(username,password);
+            if (user) {
+                const token = await jwt.sign(
+                    {
+                        user: user
+                    },
+                    SECRET,
+                    {expiresIn: TOKEN_EXPIRE_IN}
+                );
+                console.log(token);
+                return token;
+            }
+            else {
+                throw new Error('Failed to validate user');
+            }
         }
         catch(err){
             console.error(err);
             throw new Error('Failed to validate user');
         }
     },
-    user_create: async({username,password})=>{
+    user_create: async({username,password}, context)=>{
         try{
-            const code = interact_db.userCreate(username,password);
-            return code;
+            const result = await interact_db.userCreate(username,password);
+            if (result[0] == 2) {
+                return new Error(`Username ${username} already exists`);
+            }
+            else if (result[0] == 3) {
+                return new Error("Username should not contain space")
+            }
+            else {
+                let tmp = context.loaders.user.load(result[1]);
+                return tmp;
+            }
         }
         catch{
             console.error(err);
@@ -286,12 +328,34 @@ const rootValue = {
 };
 
 app.use(express.static('public'))
-
-app.use('/graphql', graphqlHTTP({
+app.set("view engine", "ejs");
+app.set('views', [__dirname + '/views',
+    __dirname + '/views/pages/'
+]);
+app.use(bodyParser.urlencoded({
+    extended: true
+}));
+app.use(bodyParser.json());
+app.use('/graphql', async (req, res) => {
+    const token = await req.headers["authentication"];
+    let user;
+    try {
+      user = await jwt.verify(token, SECRET);
+      console.log(`${user.user} user`);
+    } catch (error) {
+      console.log(`${error.message} caught`);
+    }
+    graphqlHTTP({
     schema: schema,
     rootValue: rootValue,
-    graphiql: true
-}));
+    graphiql: true,
+    context : {
+        loaders : {
+            user: new DataLoader(keys => getUsers(interact_db, keys))
+        },
+        user: user
+    }})(req, res);
+});
 
 const server = app.listen(8000);
 
