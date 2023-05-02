@@ -357,6 +357,11 @@ app.use('/graphql', async (req, res) => {
     }})(req, res);
 });
 
+app.get('/user/login.html', async function (req, res) {
+
+    res.render('login');
+});
+
 const server = app.listen(8000);
 
 

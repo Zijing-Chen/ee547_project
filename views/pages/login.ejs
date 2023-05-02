@@ -1,26 +1,23 @@
 <html>
     <head>
-        <style>
-            body {background-color: powderblue;}
-            h1   {
-             color: blue;
-             font-family: courier;
-            }
-        </style>
+        <link href="/css/login.css" rel="stylesheet" type="text/css">
+        <script src="/js/login.js"></script>
     </head>
     <body>
         <h1> <center> Website Name </center> </h1>
         <h2> Sign Up/ Sign In </h2>
-        <h3> <form>
-            Username:<br> <input type="text" name="name">
-            <br>
-            Password:<br> <input type="text" name="subject">
-         </form></h3>
-        <h4>
-            <button type="button" onclick=NULL>Login</button>
-            <button type="button" onclick=NULL'>Create Account</button>
+        <div class="form-center">
+            <form id="user-form">
+                Username:<br> <input type="text" name="username" id="username">
+                <br>
+                Password:<br> <input type="text" name="password" id="password">
             
-        </h4>
+                <div>
+                    <button type="submit" value="login">Login</button>
+                    <button type="submit" value="register">Create Account</button>
+                </div>
+            </form>
+        </div>
     </body>
 </html>
 
