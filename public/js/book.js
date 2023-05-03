@@ -1,10 +1,32 @@
-import {bookFetchById} from './utility.js';
+import {bookFetchById, addToBooklist} from './utility.js';
+
+const addBookListListener = async (bid, title) => {
+
+    const bookListButtons = Object.values(document.getElementsByClassName("add-to-list"));
+    bookListButtons.forEach(button => {
+        button.addEventListener('click', async (event) => {
+
+            const response = await addToBooklist(bid, button.value, localStorage.getItem("token"));
+            if (response.errors) {
+                document.getElementById('flash').innerHTML = "Login to add book to your book list."
+                document.getElementById('flash').style.display = 'block';
+                document.getElementById('flash').style.color = "red";
+            }
+            else {
+                document.getElementById('flash').innerHTML = `Book ${title} added to your book list.`
+                document.getElementById('flash').style.display = 'block';
+                document.getElementById('flash').style.color = "black";
+            }
+            
+        });
+    });
+}
 document.addEventListener('DOMContentLoaded', async () => {
     const url = new URL(window.location.href);
     const bid = url.pathname.split('/')[2].split('.')[0];
-
+    document.getElementById('flash').style.display = 'none';
     bookFetchById(bid)
-    .then(res => {
+    .then(async (res) => {
         if (res.data.get_book_google_api){
             document.getElementById('title').innerHTML = res.data.get_book_google_api.title;
             document.getElementById('cover-img').src = res.data.get_book_google_api.cover;
@@ -33,6 +55,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             let description_element = document.createElement('span');
             description_element.innerHTML = res.data.get_book_google_api.description;
             document.getElementById('description-content').appendChild(description_element);
+            await addBookListListener(bid, res.data.get_book_google_api.title);
         }
     });
 });

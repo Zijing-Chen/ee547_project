@@ -8,6 +8,7 @@
             <h1>
                 <span id="title">title</span>
             </h1>
+            <%- include('partials/flash-message.ejs') %>
             <div id="content">
                 <div id="cover-img-div">
                     <img src="#" alt="title" id="cover-img">
@@ -25,9 +26,9 @@
                 </div>
             </div>
             <div id="booklist">
-                <button type="submit" value="wantToRead">Want to Read</button>
-                <button type="submit" value="currentlyReading">Currently Reading</button>
-                <button type="submit" value="read">Read</button>
+                <button type="submit" value="wantToRead" class="add-to-list">Want to Read</button>
+                <button type="submit" value="currentlyReading" class="add-to-list">Currently Reading</button>
+                <button type="submit" value="read" class="add-to-list">Read</button>
             </div>
             <div id="description">
                 <h2>

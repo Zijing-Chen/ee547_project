@@ -186,7 +186,7 @@ class Database{
         try{
             await this.db.collection('user_data').updateOne(
                 {_id : new ObjectId(uid)},
-                {$push: { [booklist]: bid }}
+                {$addToSet: { [booklist]: bid }}
             );
             return true;
         }
@@ -258,12 +258,12 @@ const schema = buildSchema(`
         ) : String!
 
 		add_to_booklist(
-			book_id: ID! 
+			bid: ID! 
             booklist: String!
 		): ID
 
 		delete_from_booklist(
-			book_id: ID! 
+			bid: ID! 
             booklist: String!
 		): ID
 		
@@ -363,13 +363,12 @@ const rootValue = {
     },
 
     add_to_booklist: async({bid, booklist}, context) => {
-        console.log(context.user);
         try {
             if (!context.user) {
                 return new Error("Login required");
             }
             else {
-                await interact_db.AddToUserBookList(user._id.toString(), bid, booklist);
+                await interact_db.AddToUserBookList(context.user.user._id, bid, booklist);
                 return bid;
             }
         }
@@ -385,7 +384,7 @@ const rootValue = {
                 return new Error("Login required");
             }
             else {
-                await interact_db.DeleteFromUserBookList(user._id.toString(), bid, booklist);
+                await interact_db.DeleteFromUserBookList(context.user.user._id, bid, booklist);
                 return bid;
             }
         }
