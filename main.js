@@ -56,7 +56,10 @@ class Database{
         try{
             let collection = this.db.collection('user_data');
             let user = await collection.findOne({ username: username });
-            if(user.password==password){
+            if (!user) {
+                return null;
+            }
+            else if(user.password == password){
                 //correct password to username
                 return user;
             }
@@ -73,7 +76,6 @@ class Database{
         //allows user to input username and password and create document
         //ensure new username
         //does not allow spaces in username or password
-        console.log(username);
         try{
             
             let collection = this.db.collection('user_data');
@@ -96,7 +98,7 @@ class Database{
                 let collection = this.db.collection('user_data');
                 const { insertedId: uid } = await collection.insertOne({_id: new ObjectId(), username: username, password:password});
                 if (!uid) {
-                    throw new Error(`Error inserting user -- data:${data}`);
+                    return new Error(`Error inserting user -- data:${data}`);
                 }
                 return [1, uid.toString()];
             }
@@ -263,7 +265,8 @@ const rootValue = {
     login: async ({username,password})=>{
 
         try{
-            const user = interact_db.userValidate(username,password);
+            const user = await interact_db.userValidate(username,password);
+
             if (user) {
                 const token = await jwt.sign(
                     {
@@ -272,16 +275,15 @@ const rootValue = {
                     SECRET,
                     {expiresIn: TOKEN_EXPIRE_IN}
                 );
-                console.log(token);
                 return token;
             }
             else {
-                throw new Error('Failed to validate user');
+                return new Error('Failed to validate user');
             }
         }
         catch(err){
             console.error(err);
-            throw new Error('Failed to validate user');
+            return new Error('Failed to validate user');
         }
     },
     user_create: async({username,password}, context)=>{
@@ -294,13 +296,12 @@ const rootValue = {
                 return new Error("Username should not contain space")
             }
             else {
-                let tmp = context.loaders.user.load(result[1]);
-                return tmp;
+                return context.loaders.user.load(result[1]);
             }
         }
         catch{
             console.error(err);
-            throw new Error('Failed to create user');
+            return new Error('Failed to create user');
         }
     },
     get_all_users: async()=>{
@@ -310,7 +311,7 @@ const rootValue = {
         }
         catch(err){
             console.error(err);
-            throw new Error('Failed to get users');
+            return new Error('Failed to get users');
         }   
     },
 
