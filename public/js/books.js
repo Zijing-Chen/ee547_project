@@ -1,8 +1,8 @@
-import {bookFetch} from './utility.js';
+import {bookFetchByKeyword} from './utility.js';
 const loadMoreBook = async (page_num) => {
     const url = new URL(window.location.href);
     const keyword = url.pathname.split('/')[2];
-    bookFetch(keyword, 20, page_num * 20)
+    bookFetchByKeyword(keyword, 20, page_num * 20)
     .then(res => {
         if (res.data){
             let books = document.getElementById("books");
@@ -21,7 +21,7 @@ const loadMoreBook = async (page_num) => {
                     image.alt = res.data.search_book_google_api[i * 4 + j].title;
                     let title = document.createElement("a");
                     title.innerHTML = res.data.search_book_google_api[i * 4 + j].title;
-                    title.href = "#";
+                    title.href = `/book/${res.data.search_book_google_api[i * 4 + j].book_id}.html`;
                     entry.appendChild(image);
                     entry.appendChild(title);
                     row.appendChild(entry);

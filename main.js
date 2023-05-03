@@ -68,7 +68,7 @@ class Database{
             }
         }
         catch(err){
-            console.log(err);
+            console.error(err);
             return null;
         }
     }
@@ -104,7 +104,7 @@ class Database{
             }
         }
         catch(err){
-            console.log(err)
+            console.error(err)
             return null;
         }
     }
@@ -140,9 +140,14 @@ class Database{
             return result;
         }
         catch (err) {
-            console.log(err);
+            console.error(err);
             return [];
         }
+    }
+    async getBookFromGoogleBookApiById(bid) {
+        const { body, _ } = await this.request("get", "https://www.googleapis.com/books/v1/volumes/" + bid);
+        let result = await this.makeBookResponseFromGoogleBookApiResponse(body);
+        return result;
     }
 
     async makeBookResponseFromGoogleBookApiResponse(item) {
@@ -236,6 +241,10 @@ const schema = buildSchema(`
 		popular_books : [Book]!
 
         get_all_users: [User]!
+
+        get_book_google_api(
+            bid : ID!
+        ) : Book
     }
     type Mutation{
         user_create(
@@ -270,7 +279,6 @@ const schema = buildSchema(`
 		title: String!
 		author: [String]!
 		genre: [String]!
-		is_read: Boolean!
 		cover: String!
 		description: String!
 		page_count: Int!
@@ -358,7 +366,7 @@ const rootValue = {
         console.log(context.user);
         try {
             if (!context.user) {
-                return new Error("Signin required");
+                return new Error("Login required");
             }
             else {
                 await interact_db.AddToUserBookList(user._id.toString(), bid, booklist);
@@ -374,7 +382,7 @@ const rootValue = {
     delete_from_booklist: async({bid, booklist}, context) => {
         try {
             if (!context.user) {
-                return new Error("Signin required");
+                return new Error("Login required");
             }
             else {
                 await interact_db.DeleteFromUserBookList(user._id.toString(), bid, booklist);
@@ -384,6 +392,16 @@ const rootValue = {
         catch(err) {
             console.error(err);
             return new Error("Failed to add to booklist");
+        }
+    },
+
+    get_book_google_api: async({bid}) => {
+        try {
+            let result = await interact_db.getBookFromGoogleBookApiById(bid);
+            return result;
+        }
+        catch (err) {
+            return new Error(`Failed to get book ${bid} from Google Book Api`);
         }
     }
 
@@ -405,7 +423,7 @@ app.use('/graphql', async (req, res) => {
       user = await jwt.verify(token, SECRET);
       console.log(`${user.user} user`);
     } catch (error) {
-      console.log(`${error.message} caught`);
+      console.error(`${error.message} caught`);
     }
     graphqlHTTP({
         schema: schema,
@@ -424,9 +442,14 @@ app.get('/user/login.html', async function (req, res) {
     res.render('login');
 });
 
-app.get('/book/:keyword.html', async function (req, res) {
+app.get('/books/:keyword.html', async function (req, res) {
     
     res.render('books');
+
+});
+
+app.get('/book/:bid.html', async function (req, res) {
+    res.render('book');
 
 });
 
