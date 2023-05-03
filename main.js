@@ -131,11 +131,11 @@ class Database{
         }
     }
 
-    async getBooksFromGoogleBookApi(keyword) {
+    async getBooksFromGoogleBookApi(keyword, count, start) {
         // Make google api get request.
         // See https://developers.google.com/books/docs/v1/using#WorkingVolumes and https://cloud.google.com/docs/authentication/api-keys#using for implementationd details.
         try {
-            const { body, _ } = await this.request("get", "https://www.googleapis.com/books/v1/volumes?q=" + keyword + "&key=" + GOOGLE_BOOK_API_KEY);
+            const { body, _ } = await this.request("get", "https://www.googleapis.com/books/v1/volumes?q=" + keyword + "&maxResults=" + count + "&startIndex=" + start +"&key=" + GOOGLE_BOOK_API_KEY);
             let result = await Promise.all(body.items.map(item => this.makeBookResponseFromGoogleBookApiResponse(item)));
             return result;
         }
@@ -152,7 +152,7 @@ class Database{
             title: item.volumeInfo.subtitle ? item.volumeInfo.subtitle + item.volumeInfo.title : item.volumeInfo.title,
             author: item.volumeInfo.authors,
             genre: item.volumeInfo.categories, 
-            cover: item.volumeInfo.imageLinks.thumbnail,
+            cover: item.volumeInfo.imageLinks ? item.volumeInfo.imageLinks.thumbnail : "https://upload.wikimedia.org/wikipedia/commons/b/b9/No_Cover.jpg",
             description: item.volumeInfo.description,
             page_count: item.volumeInfo.pageCount
         }
@@ -198,7 +198,9 @@ const schema = buildSchema(`
 		) : [Book]!
 		
 		search_book_google_api(
-			keyword: String
+            keyword: String
+            count: Int
+            start: Int
 		) : [Book]!
 
 		recommend_books(
@@ -315,9 +317,9 @@ const rootValue = {
         }   
     },
 
-    search_book_google_api: async ({keyword}) => {
+    search_book_google_api: async ({keyword, count, start}) => {
         try {
-            const books = interact_db.getBooksFromGoogleBookApi(keyword);
+            const books = interact_db.getBooksFromGoogleBookApi(keyword, count? count : 20, start? start : 0);
             return books;
         }
         catch(err) {
@@ -361,6 +363,12 @@ app.use('/graphql', async (req, res) => {
 app.get('/user/login.html', async function (req, res) {
 
     res.render('login');
+});
+
+app.get('/book/:keyword.html', async function (req, res) {
+    
+    res.render('books');
+
 });
 
 const server = app.listen(8000);
