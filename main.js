@@ -175,7 +175,33 @@ class Database{
         const res = await axios(axiosOpts);
     
         return { body: res.data, headers: res.headers, status: res.status };
-      }
+    }
+
+    async AddToUserBookList(uid, bid, booklist) {
+        try{
+            await this.db.collection('user_data').updateOne(
+                {_id : new ObjectId(uid)},
+                {$push: { [booklist]: bid }}
+            );
+            return true;
+        }
+        catch (err) {
+            return false;
+        }
+    }
+
+    async DeleteFromUserBookList(uid, bid, booklist) {
+        try{
+            await this.db.collection('user_data').updateOne(
+                {_id : new ObjectId(uid)},
+                {$pull: { [booklist]: bid }}
+            );
+            return true;
+        }
+        catch (err) {
+            return false;
+        }
+    }
 }
 
 async function getUsers(db, keys) {
@@ -224,12 +250,12 @@ const schema = buildSchema(`
 
 		add_to_booklist(
 			book_id: ID! 
-			user_id: ID!
+            booklist: String!
 		): ID
 
-		finish_reading(
+		delete_from_booklist(
 			book_id: ID! 
-			user_id: ID!
+            booklist: String!
 		): ID
 		
 		custom_cover(
@@ -328,6 +354,39 @@ const rootValue = {
         }
     },
 
+    add_to_booklist: async({bid, booklist}, context) => {
+        console.log(context.user);
+        try {
+            if (!context.user) {
+                return new Error("Signin required");
+            }
+            else {
+                await interact_db.AddToUserBookList(user._id.toString(), bid, booklist);
+                return bid;
+            }
+        }
+        catch(err) {
+            console.error(err);
+            return new Error("Failed to add to booklist");
+        }
+    },
+
+    delete_from_booklist: async({bid, booklist}, context) => {
+        try {
+            if (!context.user) {
+                return new Error("Signin required");
+            }
+            else {
+                await interact_db.DeleteFromUserBookList(user._id.toString(), bid, booklist);
+                return bid;
+            }
+        }
+        catch(err) {
+            console.error(err);
+            return new Error("Failed to add to booklist");
+        }
+    }
+
 };
 
 app.use(express.static('public'))
@@ -349,14 +408,14 @@ app.use('/graphql', async (req, res) => {
       console.log(`${error.message} caught`);
     }
     graphqlHTTP({
-    schema: schema,
-    rootValue: rootValue,
-    graphiql: true,
-    context : {
-        loaders : {
-            user: new DataLoader(keys => getUsers(interact_db, keys))
-        },
-        user: user
+        schema: schema,
+        rootValue: rootValue,
+        graphiql: true,
+        context : {
+            loaders : {
+                user: new DataLoader(keys => getUsers(interact_db, keys))
+            },
+            user: user
     }})(req, res);
 });
 
