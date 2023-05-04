@@ -1,7 +1,7 @@
 import {bookFetchByKeyword} from './utility.js';
 const loadMoreBook = async (page_num) => {
     const url = new URL(window.location.href);
-    const keyword = decodeURIComponent(url.pathname.split('/')[2]);
+    const keyword = decodeURIComponent(url.pathname.split('/')[2].split('.')[0]);
     bookFetchByKeyword(keyword, 20, page_num * 20)
     .then(res => {
         console.log(res.data);

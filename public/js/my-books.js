@@ -59,7 +59,7 @@ document.addEventListener('DOMContentLoaded', async function ()  {
     const booklist = url.pathname.split('/')[3].split('.')[0]; 
     fetchBooklist(booklist, localStorage.getItem("token"))
     .then(async (res) => {
-        if (res.data.fetch_user_booklist){
+        if (!res.errors){
             res.data.fetch_user_booklist.forEach(book => {
                 let row = document.createElement('tr');
                 let cover_td = document.createElement('td');

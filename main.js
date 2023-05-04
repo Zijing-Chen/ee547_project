@@ -138,6 +138,8 @@ class Database{
         try {
             const { body, _ } = await this.request("get", "https://www.googleapis.com/books/v1/volumes?q=" + keyword + "&maxResults=" + count + "&startIndex=" + start +"&key=" + GOOGLE_BOOK_API_KEY);
             let result = await Promise.all(body.items.map(item => this.makeBookResponseFromGoogleBookApiResponse(item)));
+            console.log(result);
+            console.log(keyword);
             return result;
         }
         catch (err) {
@@ -231,7 +233,7 @@ class Database{
             const user = await this.db.collection('user_data').findOne({_id : new ObjectId(uid)});
             if (booklist === "all") {
                 let books = user.read ? user.read : [];
-                books = user.currentlyReading ? books.concat(currentlyReading) : books;
+                books = user.currentlyReading ? books.concat(user.currentlyReading) : books;
                 books = user.wantToRead ? books.concat(user.wantToRead) : books;
                 books = [...new Set(books)];
                 return books;
@@ -337,7 +339,6 @@ const schema = buildSchema(`
 
 const rootValue = {
     user(args, context) {
-        console.log(context)
         return context.user.user.username;
     },
 
@@ -539,7 +540,7 @@ app.get('/user/books/:booklist.html', async (req, res) => {
     });
 });
 
-const server = app.listen(8000);
+const server = app.listen(3000);
 
 
 //only disconnect from mongodb after server shut down
