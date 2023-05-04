@@ -198,14 +198,51 @@ class Database{
 
     async DeleteFromUserBookList(uid, bid, booklist) {
         try{
-            await this.db.collection('user_data').updateOne(
-                {_id : new ObjectId(uid)},
-                {$pull: { [booklist]: bid }}
-            );
+            if (booklist === "all") {
+                await this.db.collection('user_data').updateOne(
+                    {_id : new ObjectId(uid)},
+                    {$pull: { read: bid }}
+                );
+                await this.db.collection('user_data').updateOne(
+                    {_id : new ObjectId(uid)},
+                    {$pull: { currentlyReading: bid }}
+                );
+                await this.db.collection('user_data').updateOne(
+                    {_id : new ObjectId(uid)},
+                    {$pull: { wantToRead: bid }}
+                );
+            }
+            else {
+                await this.db.collection('user_data').updateOne(
+                    {_id : new ObjectId(uid)},
+                    {$pull: { [booklist]: bid }}
+                );
+            }
             return true;
         }
         catch (err) {
+            console.error(err);
             return false;
+        }
+    }
+
+    async getBookList(uid, booklist) {
+        try {
+            const user = await this.db.collection('user_data').findOne({_id : new ObjectId(uid)});
+            if (booklist === "all") {
+                let books = user.read ? user.read : [];
+                books = user.currentlyReading ? books.concat(currentlyReading) : books;
+                books = user.wantToRead ? books.concat(user.wantToRead) : books;
+                books = [...new Set(books)];
+                return books;
+            }
+            else {
+                return user[booklist] ? user[booklist] : [];
+            }
+        }
+        catch (err) {
+            console.error(err);
+            return [];
         }
     }
 }
@@ -230,9 +267,8 @@ const schema = buildSchema(`
         user: User
 
         fetch_user_booklist(
-			user_id: ID!
-            is_read: Boolean
-		) : [Book]!
+            booklist: String!
+		) : [Book]
 		
 		search_book_google_api(
             keyword: String
@@ -407,6 +443,23 @@ const rootValue = {
         catch (err) {
             return new Error(`Failed to get book ${bid} from Google Book Api`);
         }
+    },
+
+    fetch_user_booklist: async({booklist}, context) => {
+        try {
+            if (!context.user) {
+                return new Error("Login required");
+            }
+            else {
+                let books = await interact_db.getBookList(context.user.user._id, booklist);
+                books = books.map(book => context.loaders.book.load(book));
+                return books;
+            }
+        }
+        catch(err) {
+            console.error(err);
+            return new Error(`Failed to fetch book list ${booklist}`);
+        }
     }
 
 };
@@ -473,6 +526,13 @@ app.get('/dashboard.html', async (req, res) => {
     res.locals.title = "Dashboard";
     res.render('layout', {
         body: await render("dashboard")
+    });
+});
+app.get('/user/books/:booklist.html', async (req, res) => {
+    const render = util.promisify(res.render).bind(res);
+    res.locals.title = "my-books";
+    res.render('layout', {
+        body: await render("my-books")
     });
 });
 
