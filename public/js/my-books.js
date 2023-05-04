@@ -127,6 +127,9 @@ document.addEventListener('DOMContentLoaded', async function ()  {
                 book_table.appendChild(row);
             });
         }
+        else {
+            window.location.href = "http://localhost:3000/user/login.html";
+        }
     })
     .then(() => {
         addBookListListener();
