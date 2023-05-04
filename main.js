@@ -216,6 +216,11 @@ async function getUsers(db, keys) {
     return keys.map(key => users.find(user => user.user_id == key.toString()) || new Error(`User ${key} doesn't exist`));
 }
 
+async function getBooks(db, keys) {
+    let books = await Promise.all(keys.map(key => db.getBookFromGoogleBookApiById(key)));
+    return keys.map(key => books.find(book => book.book_id == key) || new Error(`Book ${key} doesn't exist`));
+}
+
 const app = express();
 const interact_db = new Database();
 interact_db._connect(MONGO_CONFIG_FILE);
@@ -395,10 +400,9 @@ const rootValue = {
         }
     },
 
-    get_book_google_api: async({bid}) => {
+    get_book_google_api: async({bid}, context) => {
         try {
-            let result = await interact_db.getBookFromGoogleBookApiById(bid);
-            return result;
+            return context.loaders.book.load(bid);
         }
         catch (err) {
             return new Error(`Failed to get book ${bid} from Google Book Api`);
@@ -407,7 +411,7 @@ const rootValue = {
 
 };
 
-app.use(express.static('public'))
+app.use(express.static('public'));
 app.set("view engine", "ejs");
 app.set('views', [__dirname + '/views',
     __dirname + '/views/pages/'
@@ -431,7 +435,8 @@ app.use('/graphql', async (req, res) => {
         graphiql: true,
         context : {
             loaders : {
-                user: new DataLoader(keys => getUsers(interact_db, keys))
+                user: new DataLoader(keys => getUsers(interact_db, keys)),
+                book: new DataLoader(keys => getBooks(interact_db, keys))
             },
             user: user
     }})(req, res);
