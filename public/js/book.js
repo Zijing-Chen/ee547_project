@@ -1,20 +1,21 @@
-import {bookFetchById, addToBooklist} from './utility.js';
+import {bookFetchById, addToBooklist, deleteFromBooklist} from './utility.js';
 
 const addBookListListener = async (bid, title) => {
 
     const bookListButtons = Object.values(document.getElementsByClassName("add-to-list"));
     bookListButtons.forEach(button => {
         button.addEventListener('click', async (event) => {
-            await deleteFromBooklist(event.target.form.firstChild.name, "read", localStorage.getItem("token"));
-            await deleteFromBooklist(event.target.form.firstChild.name, "currentlyReading", localStorage.getItem("token"));
-            await deleteFromBooklist(event.target.form.firstChild.name, "wantToRead", localStorage.getItem("token"));
             const response = await addToBooklist(bid, button.value, localStorage.getItem("token"));
+            console.log(response);
             if (response.errors) {
                 document.getElementById('flash').innerHTML = "Login to add book to your book list."
                 document.getElementById('flash').style.display = 'block';
                 document.getElementById('flash').style.color = "red";
             }
             else {
+                await deleteFromBooklist(event.target.form.firstChild.name, "read", localStorage.getItem("token"));
+            await deleteFromBooklist(event.target.form.firstChild.name, "currentlyReading", localStorage.getItem("token"));
+            await deleteFromBooklist(event.target.form.firstChild.name, "wantToRead", localStorage.getItem("token"));
                 document.getElementById('flash').innerHTML = `Book ${title} added to your book list.`
                 document.getElementById('flash').style.display = 'block';
                 document.getElementById('flash').style.color = "black";
