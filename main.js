@@ -264,7 +264,7 @@ interact_db._connect(MONGO_CONFIG_FILE);
 
 const schema = buildSchema(`
     type Query{
-        user: User
+        user: String
 
         fetch_user_booklist(
             booklist: String!
@@ -337,7 +337,8 @@ const schema = buildSchema(`
 
 const rootValue = {
     user(args, context) {
-        return context.user;
+        //console.log(context.user.user.username)
+        return context.user.user.username;
     },
 
     login: async ({username,password})=>{
@@ -536,7 +537,7 @@ app.get('/user/books/:booklist.html', async (req, res) => {
     });
 });
 
-const server = app.listen(3000);
+const server = app.listen(8000);
 
 
 //only disconnect from mongodb after server shut down

@@ -1,12 +1,21 @@
 <nav>
     <ul>
-      <li><a href="/user/books/all.html">My BookList</a></li>
-      <li><a href="#">Discovery</a></li>
-      <li>
-        <%- include('partials/search-bar') %>
-      </li>
-      <li><a href="/dashboard.html">Dashboard</a></li>
+        <li><a href="/user/books/all.html">My BookList</a></li>
+        <li><a href="#">Discovery</a></li>
+        <li><a href="/dashboard.html">Dashboard</a></li>
+    </ul>
+    <ul>
+        <li>
+            <%- include('partials/search-bar') %>
+        </li>
+    </ul>
+    <ul>
+        <li id="login-link-container">
+            <button></button>
+        </li>
     </ul>
   </nav>
   
+  <!-- include the nav-bar.js file -->
+  <script src="/js/nav-bar.js"></script>
   
