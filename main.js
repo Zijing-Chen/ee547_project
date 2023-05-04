@@ -138,8 +138,6 @@ class Database{
         try {
             const { body, _ } = await this.request("get", "https://www.googleapis.com/books/v1/volumes?q=" + keyword + "&maxResults=" + count + "&startIndex=" + start +"&key=" + GOOGLE_BOOK_API_KEY);
             let result = await Promise.all(body.items.map(item => this.makeBookResponseFromGoogleBookApiResponse(item)));
-            console.log(result);
-            console.log(keyword);
             return result;
         }
         catch (err) {
@@ -157,7 +155,7 @@ class Database{
         // Parse google api get request response.
         let book = {
             book_id: item.id,
-            title: item.volumeInfo.subtitle ? item.volumeInfo.subtitle + item.volumeInfo.title : item.volumeInfo.title,
+            title: item.volumeInfo.subtitle ? item.volumeInfo.title + "\n" + item.volumeInfo.subtitle : item.volumeInfo.title,
             author: item.volumeInfo.authors,
             genre: item.volumeInfo.categories, 
             cover: item.volumeInfo.imageLinks ? item.volumeInfo.imageLinks.thumbnail : "https://upload.wikimedia.org/wikipedia/commons/b/b9/No_Cover.jpg",
@@ -482,7 +480,6 @@ app.use('/graphql', async (req, res) => {
     let user;
     try {
       user = await jwt.verify(token, SECRET);
-      console.log(`${user.user} user`);
     } catch (error) {
       console.error(`${error.message} caught`);
     }
