@@ -448,8 +448,12 @@ app.get('/books/:keyword.html', async function (req, res) {
 });
 
 app.get('/book/:bid.html', async function (req, res) {
-    res.render('book');
+    res.render('book', { title: 'Book', layout: 'layout' });
 
+});
+
+app.get('/dashboard', (req, res) => {
+    res.render('dashboard');
 });
 
 const server = app.listen(8000);

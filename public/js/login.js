@@ -41,7 +41,7 @@ const registerFetch = async (username, password) => {
 document.addEventListener('DOMContentLoaded', () => {
     const form = document.getElementById('user-form');
     document.getElementById('flash').style.display = 'none';
-    form.addEventListener('submit', (event) => {
+    form.addEventListener('submit', async(event) => {
         event.preventDefault();
         if (document.activeElement.value == "login") {
             if (localStorage.getItem("token")) {
@@ -62,6 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         document.getElementById('flash').style.display = 'block';
                         document.getElementById('flash').style.color = "black";
                         localStorage.setItem("token", res.data.login);
+                        window.location.href = "/dashboard"; // Redirect to the dashboard page
                     }
                 });
             }
@@ -70,7 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
             registerFetch(document.getElementById("username").value, document.getElementById("password").value)
             .then(res => {
                 if (!res.data) {
-                    document.getElementById('flash').innerHTML = "Registration failed.";
+                    document.getElementById('flash').innerHTML = "Registration failed";
                     document.getElementById('flash').style.display = 'block';
                     document.getElementById('flash').style.color = "red";
                 }
