@@ -24,6 +24,7 @@ function handleButtonClick(event) {
     // logout the user
     logoutUser();
     // redirect to the login page after logout
+    window.location.href = '/user/login.html';
   } else {
     // go to the login page
     window.location.href = "/user/login.html";

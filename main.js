@@ -337,7 +337,7 @@ const schema = buildSchema(`
 
 const rootValue = {
     user(args, context) {
-        //console.log(context.user.user.username)
+        console.log(context)
         return context.user.user.username;
     },
 
