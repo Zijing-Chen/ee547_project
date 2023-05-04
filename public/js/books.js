@@ -18,6 +18,7 @@ const loadMoreBook = async (page_num) => {
                     let entry = document.createElement('div');
                     entry.classList.add("book-column");
                     let image = document.createElement('img');
+                    image.classList.add("cover-image");
                     image.src = res.data.search_book_google_api[i * 4 + j].cover;
                     image.alt = res.data.search_book_google_api[i * 4 + j].title;
                     let title = document.createElement("a");

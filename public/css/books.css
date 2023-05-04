@@ -12,3 +12,8 @@
 img {
     display: block;
 }
+
+.cover-image {
+    width: 180px;
+    height: 200px;
+}
