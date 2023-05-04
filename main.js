@@ -14,6 +14,7 @@ const SECRET = "sdfglkjdnglewbgwpgkihipq2iu;liusher;";
 const TOKEN_EXPIRE_IN = "1d";
 const MONGO_CONFIG_FILE = './config/mongo.json';
 const bodyParser = require('body-parser');
+const util = require('util');
 
 class Database{
     async _connect(configFile){
@@ -437,26 +438,40 @@ app.use('/graphql', async (req, res) => {
 });
 
 app.get('/user/login.html', async function (req, res) {
-
-    res.render('login');
+    const render = util.promisify(res.render).bind(res);
+    res.locals.title = "Log in";
+    res.render('layout', {
+        body: await render("login")
+    });
 });
 
 app.get('/books/:keyword.html', async function (req, res) {
-    
-    res.render('books');
+    const render = util.promisify(res.render).bind(res);
+    res.locals.title = "Books";
+    res.render('layout', {
+        body: await render("books")
+    });
 
 });
 
 app.get('/book/:bid.html', async function (req, res) {
-    res.render('book', { title: 'Book', layout: 'layout' });
+    const render = util.promisify(res.render).bind(res);
+    res.locals.title = "Book";
+    res.render('layout', {
+        body: await render("book")
+    });
 
 });
 
-app.get('/dashboard', (req, res) => {
-    res.render('dashboard');
+app.get('/dashboard.html', async (req, res) => {
+    const render = util.promisify(res.render).bind(res);
+    res.locals.title = "Dashboard";
+    res.render('layout', {
+        body: await render("dashboard")
+    });
 });
 
-const server = app.listen(8000);
+const server = app.listen(3000);
 
 
 //only disconnect from mongodb after server shut down

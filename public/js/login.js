@@ -62,7 +62,7 @@ document.addEventListener('DOMContentLoaded', async (event) => {
                         document.getElementById('flash').style.display = 'block';
                         document.getElementById('flash').style.color = "black";
                         localStorage.setItem("token", res.data.login);
-                        window.location.href = "/dashboard"; // Redirect to the dashboard page
+                        window.location.href = "/dashboard.html"; // Redirect to the dashboard page
                     }
                 });
             }
