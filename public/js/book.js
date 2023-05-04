@@ -37,7 +37,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             res.data.get_book_google_api.author.forEach(a => {
                 let author_element = document.createElement('a');
                 author_element.innerHTML = a;
-                author_element.href = `/books/inauthor:${a}`;
+                author_element.href = `/books/inauthor:${encodeURIComponent(a)}.html`;
                 document.getElementById('author').appendChild(author_element);
                 let space_element = document.createElement('span');
                 space_element.innerHTML = "&nbsp&nbsp";
@@ -46,7 +46,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             res.data.get_book_google_api.genre.forEach(g => {
                 let genre_element = document.createElement('a');
                 genre_element.innerHTML = g;
-                genre_element.href = `/books/subject:${g}`;
+                genre_element.href = `/books/subject:${encodeURIComponent(g)}.html`;
                 document.getElementById('genre').appendChild(genre_element);
                 let space_element = document.createElement('span');
                 space_element.innerHTML = "&nbsp&nbsp";

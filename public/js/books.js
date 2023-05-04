@@ -1,12 +1,13 @@
 import {bookFetchByKeyword} from './utility.js';
 const loadMoreBook = async (page_num) => {
     const url = new URL(window.location.href);
-    const keyword = url.pathname.split('/')[2];
+    const keyword = decodeURIComponent(url.pathname.split('/')[2]);
     bookFetchByKeyword(keyword, 20, page_num * 20)
     .then(res => {
+        console.log(res.data);
         if (res.data){
             let books = document.getElementById("books");
-            let num_line = Math.floor(res.data.search_book_google_api.length / 4);
+            let num_line = Math.ceil(res.data.search_book_google_api.length / 4);
             for (let i = 0; i < num_line; i++) {
                 let row = document.createElement('div');
                 row.classList.add("book-row");
