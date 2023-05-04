@@ -5,7 +5,9 @@ const addBookListListener = async (bid, title) => {
     const bookListButtons = Object.values(document.getElementsByClassName("add-to-list"));
     bookListButtons.forEach(button => {
         button.addEventListener('click', async (event) => {
-
+            await deleteFromBooklist(event.target.form.firstChild.name, "read", localStorage.getItem("token"));
+            await deleteFromBooklist(event.target.form.firstChild.name, "currentlyReading", localStorage.getItem("token"));
+            await deleteFromBooklist(event.target.form.firstChild.name, "wantToRead", localStorage.getItem("token"));
             const response = await addToBooklist(bid, button.value, localStorage.getItem("token"));
             if (response.errors) {
                 document.getElementById('flash').innerHTML = "Login to add book to your book list."
