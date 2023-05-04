@@ -396,7 +396,9 @@ const rootValue = {
 
     search_book_google_api: async ({keyword, count, start}) => {
         try {
-            const books = interact_db.getBooksFromGoogleBookApi(keyword, count? count : 20, start? start : 0);
+
+            const books = await interact_db.getBooksFromGoogleBookApi(keyword, count? count : 20, start? start : 0);
+
             return books;
         }
         catch(err) {
