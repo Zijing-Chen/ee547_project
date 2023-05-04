@@ -38,19 +38,19 @@ const registerFetch = async (username, password) => {
     return responseJson;
 };
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async (event) => {
     const form = document.getElementById('user-form');
     document.getElementById('flash').style.display = 'none';
     form.addEventListener('submit', async(event) => {
         event.preventDefault();
-        if (document.activeElement.value == "login") {
+        if (event.submitter.value == "login") {
             if (localStorage.getItem("token")) {
                 document.getElementById('flash').innerHTML = "Already logged in.";
                 document.getElementById('flash').style.display = 'block';
                 document.getElementById('flash').style.color = "red";
             }
             else {
-                loginFetch(document.getElementById("username").value, document.getElementById("password").value)
+                await loginFetch(document.getElementById("username").value, document.getElementById("password").value)
                 .then(res => {
                     if (!res.data){
                         document.getElementById('flash').innerHTML = "Login failed.";
@@ -67,7 +67,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             }
         }
-        else if (document.activeElement.value == "register") {
+        else if (event.submitter.value == "register") {
             registerFetch(document.getElementById("username").value, document.getElementById("password").value)
             .then(res => {
                 if (!res.data) {
