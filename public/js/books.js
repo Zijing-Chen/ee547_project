@@ -22,7 +22,7 @@ const loadMoreBook = async (page_num) => {
                     image.src = res.data.search_book_google_api[i * 4 + j].cover;
                     image.alt = res.data.search_book_google_api[i * 4 + j].title;
                     let title = document.createElement("a");
-                    title.innerHTML = res.data.search_book_google_api[i * 4 + j].title;
+                    title.innerHTML = "<pre>" + res.data.search_book_google_api[i * 4 + j].title + "</pre>";
                     title.href = `/book/${res.data.search_book_google_api[i * 4 + j].book_id}.html`;
                     entry.appendChild(image);
                     entry.appendChild(title);

@@ -17,3 +17,8 @@ img {
     width: 180px;
     height: 200px;
 }
+
+pre {
+    white-space: pre-line;
+    word-wrap: break-word;
+}
