@@ -31,7 +31,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     bookFetchById(bid)
     .then(async (res) => {
         if (res.data.get_book_google_api){
-            document.getElementById('title').innerHTML = res.data.get_book_google_api.title;
+            document.getElementById('title').innerHTML = "<pre>" + res.data.get_book_google_api.title + "</pre>";
+            console.log(res.data.get_book_google_api.title);
             document.getElementById('cover-img').src = res.data.get_book_google_api.cover;
             document.getElementById('cover-img').alt = res.data.get_book_google_api.title;
             res.data.get_book_google_api.author.forEach(a => {

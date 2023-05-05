@@ -1,7 +1,7 @@
 import {bookFetchByKeyword} from './utility.js';
 const loadMoreBook = async (page_num) => {
     const url = new URL(window.location.href);
-    const keyword = decodeURIComponent(url.pathname.split('/')[2]);
+    const keyword = decodeURIComponent(url.pathname.split('/')[2].split('.')[0]);
     bookFetchByKeyword(keyword, 20, page_num * 20)
     .then(res => {
         if (res.data){
@@ -17,10 +17,11 @@ const loadMoreBook = async (page_num) => {
                     let entry = document.createElement('div');
                     entry.classList.add("book-column");
                     let image = document.createElement('img');
+                    image.classList.add("cover-image");
                     image.src = res.data.search_book_google_api[i * 4 + j].cover;
                     image.alt = res.data.search_book_google_api[i * 4 + j].title;
                     let title = document.createElement("a");
-                    title.innerHTML = res.data.search_book_google_api[i * 4 + j].title;
+                    title.innerHTML = "<pre>" + res.data.search_book_google_api[i * 4 + j].title + "</pre>";
                     title.href = `/book/${res.data.search_book_google_api[i * 4 + j].book_id}.html`;
                     entry.appendChild(image);
                     entry.appendChild(title);

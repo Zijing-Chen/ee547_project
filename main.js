@@ -176,7 +176,7 @@ class Database{
         // Parse google api get request response.
         let book = {
             book_id: item.id,
-            title: item.volumeInfo.subtitle ? item.volumeInfo.subtitle + item.volumeInfo.title : item.volumeInfo.title,
+            title: item.volumeInfo.subtitle ? item.volumeInfo.title + "\n" + item.volumeInfo.subtitle : item.volumeInfo.title,
             author: item.volumeInfo.authors,
             genre: item.volumeInfo.categories, 
             cover: item.volumeInfo.imageLinks ? item.volumeInfo.imageLinks.thumbnail : "https://upload.wikimedia.org/wikipedia/commons/b/b9/No_Cover.jpg",
@@ -356,7 +356,6 @@ const schema = buildSchema(`
 
 const rootValue = {
     user(args, context) {
-        console.log(context)
         return context.user.user.username;
     },
 
@@ -516,7 +515,6 @@ app.use('/graphql', async (req, res) => {
     let user;
     try {
       user = await jwt.verify(token, SECRET);
-      console.log(`${user.user} user`);
     } catch (error) {
       console.error(`${error.message} caught`);
     }
@@ -581,7 +579,7 @@ app.get('/user/recommend.html', async (req, res) => {
     });
 });
 
-const server = app.listen(8000);
+const server = app.listen(3000);
 
 
 //only disconnect from mongodb after server shut down
