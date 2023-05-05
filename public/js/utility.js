@@ -90,3 +90,25 @@ export const deleteFromBooklist = async (bid, booklist, token) => {
     const responseJson = await response.json();
     return responseJson;
 };
+
+export const bookFetchByPopular = async (count, start) => {
+    const query = JSON.stringify({
+        query: `query {
+            recommend_books{
+                    cover,
+                    book_id,
+                    title
+                }
+            }
+        `,
+        variables: null
+    });
+    const response = await fetch('/graphql', {
+        headers: {'content-type': 'application/json'},
+        method: 'POST',
+        body: query,
+    });
+
+    const responseJson = await response.json();
+    return responseJson;
+};

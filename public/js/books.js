@@ -4,7 +4,6 @@ const loadMoreBook = async (page_num) => {
     const keyword = decodeURIComponent(url.pathname.split('/')[2]);
     bookFetchByKeyword(keyword, 20, page_num * 20)
     .then(res => {
-        console.log(res.data);
         if (res.data){
             let books = document.getElementById("books");
             let num_line = Math.ceil(res.data.search_book_google_api.length / 4);

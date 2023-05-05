@@ -131,7 +131,28 @@ class Database{
             return [];
         }
     }
-
+    async getPopularBook() {
+        // Make google api get request.
+        // See https://developers.google.com/books/docs/v1/using#WorkingVolumes and https://cloud.google.com/docs/authentication/api-keys#using for implementationd details.
+        try {
+            const popularBooks = JSON.parse(fs.readFileSync('./public/popular_books.json'));
+            const allResults = [];
+            for (const book of popularBooks) {
+                const query = `${book.title} by ${book.author}`;
+                const { body, _ } = await this.request("get",`https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}&maxResults=1&key=${GOOGLE_BOOK_API_KEY}`);
+                if (body.items && body.items.length > 0) {
+                    const book = await this.makeBookResponseFromGoogleBookApiResponse(body.items[0]);
+                    allResults.push(book);
+                }
+            }
+            return allResults;
+        }
+        catch (err) {
+            console.error(err);
+            return [];
+        }
+    }
+    
     async getBooksFromGoogleBookApi(keyword, count, start) {
         // Make google api get request.
         // See https://developers.google.com/books/docs/v1/using#WorkingVolumes and https://cloud.google.com/docs/authentication/api-keys#using for implementationd details.
@@ -231,7 +252,7 @@ class Database{
             const user = await this.db.collection('user_data').findOne({_id : new ObjectId(uid)});
             if (booklist === "all") {
                 let books = user.read ? user.read : [];
-                books = user.currentlyReading ? books.concat(currentlyReading) : books;
+                books = user.currentlyReading ? books.concat(user.currentlyReading) : books;
                 books = user.wantToRead ? books.concat(user.wantToRead) : books;
                 books = [...new Set(books)];
                 return books;
@@ -276,9 +297,7 @@ const schema = buildSchema(`
             start: Int
 		) : [Book]!
 
-		recommend_books(
-			user_id: ID!
-		) : [Book]!
+		recommend_books : [Book]!
 
 		popular_books : [Book]!
 
@@ -310,7 +329,7 @@ const schema = buildSchema(`
 		): ID
 		
 		custom_cover(
-			book_id: ID!
+			bid: ID!
 			user_id: ID!
 			file: String!
 		): ID
@@ -404,6 +423,22 @@ const rootValue = {
         catch(err) {
             console.error(err);
             return new Error(`Google book api search with q=${keyword} failed.`);
+        }
+    },
+    recommend_books: async(args,context) => {
+        try {
+            /*if (!context.user) {
+                return new Error("Login required");
+            }
+            else {*/
+                //const books = await interact_db.getBooksFromGoogleBookApi("key", count? count : 20, start? start : 0);
+                const books = await interact_db.getPopularBook();
+                return books;
+            //}
+        }
+        catch(err) {
+            console.error(err);
+            return new Error("Failed generate recommended booklist");
         }
     },
 
@@ -536,6 +571,13 @@ app.get('/user/books/:booklist.html', async (req, res) => {
     res.locals.title = "my-books";
     res.render('layout', {
         body: await render("my-books")
+    });
+});
+app.get('/user/recommend.html', async (req, res) => {
+    const render = util.promisify(res.render).bind(res);
+    res.locals.title = "recommend";
+    res.render('layout', {
+        body: await render("recommend")
     });
 });
 

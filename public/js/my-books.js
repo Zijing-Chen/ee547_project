@@ -98,16 +98,25 @@ document.addEventListener('DOMContentLoaded', async function ()  {
                 let option_element1 = document.createElement('option');
                 option_element1.value = "read";
                 option_element1.innerHTML = "read";
+                if (booklist === "read") {
+                    option_element1.selected = true;
+                }
                 select_element.appendChild(option_element1);
 
                 let option_element2 = document.createElement('option');
                 option_element2.value = "currentlyReading";
                 option_element2.innerHTML = "currently reading"
+                if (booklist === "currentlyReading") {
+                    option_element2.selected = true;
+                }
                 select_element.appendChild(option_element2);
 
                 let option_element3 = document.createElement('option');
                 option_element3.value = "wantToRead";
                 option_element3.innerHTML = "want to read";
+                if (booklist === "wantToRead") {
+                    option_element3.selected = true;
+                }
                 select_element.appendChild(option_element3);
 
                 let option_element4 = document.createElement('option');
@@ -128,7 +137,7 @@ document.addEventListener('DOMContentLoaded', async function ()  {
             });
         }
         else {
-            window.location.href = "http://localhost:3000/user/login.html";
+            window.location.href = window.location.origin + "/user/login.html";
         }
     })
     .then(() => {

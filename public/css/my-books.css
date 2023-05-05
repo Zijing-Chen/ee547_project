@@ -1,8 +1,106 @@
-#left {
-    float: left;
-    width: 25%;
+/* Set background color for the page */
+body {
+    background-color: #f7f7f7;
 }
+  
+
+div > h1 {
+    text-align: center;
+    margin-top: 50px;
+    margin-bottom: 50px;
+}
+
+#top {
+    background-color: white;
+    padding: 10px;
+    font-size: 1.2rem;
+    font-weight: bold;
+  margin-bottom: 20px;
+}
+  
+ #left {
+    float: left;
+    width: 200px;
+    margin-right: 20px;
+}
+  
+.usershelf {
+    margin-bottom: 10px;
+}
+  
+.usershelf a {
+    display: block;
+    padding: 5px;
+    border-radius: 5px;
+    color: #4d4d4d;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+}
+  
+.usershelf a:hover {
+    background-color: #eee;
+}
+  
 #right {
-    float: left;
-    width: 75%;
+    overflow: auto;
+    margin-left: 240px;
 }
+  
+#books {
+    width: 100%;
+    border-collapse: collapse;
+}
+  
+#books th,
+#books td {
+    padding: 10px;
+    text-align: left;
+}
+  
+#books th {
+    background-color: #f2f2f2;
+    font-weight: bold;
+}
+  
+.cover-img {
+    width: 80px;
+}
+  
+.title {
+    font-weight: bold;
+    color: #4d4d4d;
+    text-decoration: none;
+}
+  
+.title:hover {
+    text-decoration: underline;
+}
+  
+.author {
+    color: #666;
+    text-decoration: none;
+}
+  
+.author:hover {
+    text-decoration: underline;
+}
+  
+.booklist-action-form {
+    display: inline-block;
+}
+  
+.booklist-action-button {
+    margin-left: 10px;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 5px;
+    background-color: #4d4d4d;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+  
+.booklist-action-button:hover {
+    background-color: #333;
+}
+  
