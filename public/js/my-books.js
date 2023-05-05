@@ -83,7 +83,7 @@ document.addEventListener('DOMContentLoaded', async function ()  {
                     let author = document.createElement('a');
                     author.classList.add("author");
                     author.innerHTML = a;
-                    author.href = `/books/inauthor:${a}`;
+                    author.href = `/books/inauthor:${a}.html`;
                     author_td.appendChild(author);
                     let space_element = document.createElement('span');
                     space_element.innerHTML = "&nbsp&nbsp";
