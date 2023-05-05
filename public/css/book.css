@@ -1,4 +1,62 @@
-pre {
-    white-space: pre-line;
-    word-wrap: break-word;
+body {
+    font-family: Arial, Helvetica, sans-serif;
+}
+h1 {
+    text-align: center;
+}
+h1 pre {
+    font-family: Arial, Helvetica, sans-serif;
+}
+#cover-img-div {
+    text-align: center;
+}
+
+#cover-img {
+    width: 15%;
+    border-radius: 5px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+}
+#book-info div {
+    margin-bottom: 10px;
+    margin-left: 20px;
+    
+}
+
+#book-info a {
+    color:black
+}
+#book-info a:hover {
+    color: #5c67a1;
+}
+
+#booklist {
+    text-align: center;
+    margin-bottom: 20px;
+}
+.add-to-list {
+    display: inline-block;
+    background-color: #396d9b;
+    color: #fff;
+    padding: 10px 20px;
+    margin: 0 10px;
+    border: none;
+    cursor: pointer;
+    border-radius: 4px;
+}
+.add-to-list:hover {
+    background-color: #1d476c;
+}
+
+#description {
+    margin-bottom: 20px;
+    margin-left: 20px;
+    margin-right: 20px;
+    
+}
+
+#description-content {
+    margin-top: 10px;
+    padding: 20px;
+    border: 1px solid #cdcdcd;
+    border-radius: 5px;
 }

@@ -6,20 +6,18 @@
 }
 
 body {
-    font-family: Arial, sans-serif;
-    align-items: center;
+    font-family: Arial;
 }
 
 nav {
     background-color: #333;
     display: flex;
-    justify-content: space-between;
-    padding: 1rem;
+    padding: 1.2rem;
 }
 
 nav ul {
-    list-style: none;
     display: flex;
+    list-style: none;
     align-items: center;
 }
 
@@ -28,7 +26,7 @@ nav li {
 }
 
 nav a {
-    color: white;
+    color: rgb(255, 255, 255);
     text-decoration: none;
     padding: 0.5rem 1rem;
 }

@@ -1,21 +1,10 @@
-body {
-    background-color: #f5f5f5;
-    color: #333;
-    line-height: 1.6;
-    margin: 0;
-    padding: 0;
-}
 
-#books {
-    width: 80%;
-    margin: 20px auto;
-}
 
 .book-row {
     display: flex;
     flex-wrap: wrap;
-    justify-content: space-around;
     margin-bottom: 30px;
+    justify-content: space-around;
 }
 
 .book-column {
@@ -30,7 +19,7 @@ body {
 
 .book-column img {
     max-width: 100%;
-    height: auto;
+    height: 80%;
     border-radius: 5px;
 }
 
@@ -66,3 +55,4 @@ body {
 #loadMore:hover {
     background-color: #333;
 }
+
