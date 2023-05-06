@@ -299,7 +299,6 @@ const schema = buildSchema(`
 
 		recommend_books : [Book]!
 
-		popular_books : [Book]!
 
         get_all_users: [User]!
 
@@ -328,11 +327,6 @@ const schema = buildSchema(`
             booklist: String!
 		): ID
 		
-		custom_cover(
-			bid: ID!
-			user_id: ID!
-			file: String!
-		): ID
     }
 
 	type Book{
