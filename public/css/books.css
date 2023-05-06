@@ -1,5 +1,14 @@
-
-
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f2f2f2;
+    margin: 0;
+}
+  
+#books {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 20px;
+}
 .book-row {
     display: flex;
     flex-wrap: wrap;
@@ -12,6 +21,7 @@
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
     border-radius: 5px;
     width: 20%;
+    height:auto;
     padding: 15px;
     margin-bottom: 20px;
     text-align: center;
@@ -24,11 +34,13 @@
 }
 
 .book-column a {
-    display: block;
+    display: flex;
+    justify-content: center;
     color: #333;
     font-weight: bold;
     text-decoration: none;
     margin-top: 10px;
+    overflow: hidden;
 }
 
 .book-column a:hover {
